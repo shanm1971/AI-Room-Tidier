@@ -1,0 +1,5 @@
+{
+  "name": "AI Room Tidier",
+  "description": "Upload a photo of your messy room and get a new, AI-generated image of the same room but clean, tidy, and organized. See the magic of a tidy space instantly.",
+  "requestFramePermissions": []
+}
