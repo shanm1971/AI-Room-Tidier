@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TAIS Website Image To-Do List</title>
+  <style>
+    :root {
+      --bg: #0d0d1a;
+      --surface: #141428;
+      --card: #1a1a35;
+      --card-hover: #1f1f40;
+      --border: #2a2a55;
+      --purple-deep: #4b0082;
+      --purple: #7b2ff7;
+      --purple-light: #9d5cff;
+      --blue-deep: #0a1a6b;
+      --blue: #2563eb;
+      --blue-light: #60a5fa;
+      --cyan: #22d3ee;
+      --text: #e2e8f0;
+      --text-muted: #94a3b8;
+      --done-text: #4b5563;
+      --done-bg: #111120;
+      --green: #10b981;
+      --grad-1: linear-gradient(135deg, #7b2ff7, #2563eb);
+      --grad-2: linear-gradient(135deg, #9d5cff, #22d3ee);
+      --glow-purple: 0 0 20px rgba(123, 47, 247, 0.4);
+      --glow-blue: 0 0 20px rgba(37, 99, 235, 0.4);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      min-height: 100vh;
+    }
+
+    /* ── Header ── */
+    header {
+      background: linear-gradient(135deg, #0d0d1a 0%, #1a0035 50%, #001a4d 100%);
+      border-bottom: 1px solid var(--border);
+      padding: 24px 32px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(12px);
+    }
+
+    .header-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo-icon {
+      width: 40px;
+      height: 40px;
+      background: var(--grad-1);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      box-shadow: var(--glow-purple);
+    }
+
+    h1 {
+      font-size: 1.4rem;
+      font-weight: 700;
+      background: var(--grad-2);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .subtitle {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    /* ── Progress bar ── */
+    .progress-wrap {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-shrink: 0;
+    }
+
+    .progress-label {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+
+    .progress-bar-outer {
+      width: 160px;
+      height: 8px;
+      background: var(--border);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+
+    .progress-bar-inner {
+      height: 100%;
+      background: var(--grad-1);
+      border-radius: 99px;
+      transition: width 0.4s ease;
+      box-shadow: var(--glow-purple);
+    }
+
+    .progress-pct {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--purple-light);
+      min-width: 36px;
+      text-align: right;
+    }
+
+    /* ── Main layout ── */
+    main {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 32px 24px 64px;
+    }
+
+    /* ── Section ── */
+    .section {
+      margin-bottom: 28px;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      background: var(--card);
+      transition: box-shadow 0.2s;
+    }
+
+    .section:hover {
+      box-shadow: var(--glow-purple);
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 20px;
+      cursor: pointer;
+      user-select: none;
+      background: linear-gradient(90deg, rgba(123,47,247,0.15) 0%, rgba(37,99,235,0.08) 100%);
+      border-bottom: 1px solid var(--border);
+      gap: 12px;
+    }
+
+    .section-header:hover {
+      background: linear-gradient(90deg, rgba(123,47,247,0.25) 0%, rgba(37,99,235,0.15) 100%);
+    }
+
+    .section-title-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex: 1;
+    }
+
+    .section-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+
+    .section-name {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .section-meta {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+
+    .badge {
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 99px;
+      background: var(--grad-1);
+      color: #fff;
+      white-space: nowrap;
+    }
+
+    .badge.done {
+      background: var(--green);
+    }
+
+    .chevron {
+      color: var(--text-muted);
+      transition: transform 0.25s;
+      font-size: 12px;
+    }
+
+    .section.collapsed .chevron {
+      transform: rotate(-90deg);
+    }
+
+    .task-list {
+      padding: 8px 0;
+    }
+
+    .section.collapsed .task-list {
+      display: none;
+    }
+
+    /* ── Task item ── */
+    .task {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      padding: 12px 20px;
+      border-bottom: 1px solid rgba(42,42,85,0.5);
+      cursor: pointer;
+      transition: background 0.15s;
+      position: relative;
+    }
+
+    .task:last-child {
+      border-bottom: none;
+    }
+
+    .task:hover {
+      background: var(--card-hover);
+    }
+
+    .task.done {
+      background: var(--done-bg);
+    }
+
+    .task.done:hover {
+      background: #131325;
+    }
+
+    /* Checkbox */
+    .checkbox {
+      width: 20px;
+      height: 20px;
+      border-radius: 6px;
+      border: 2px solid var(--purple-light);
+      flex-shrink: 0;
+      margin-top: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+      background: transparent;
+    }
+
+    .task.done .checkbox {
+      background: var(--green);
+      border-color: var(--green);
+      box-shadow: 0 0 8px rgba(16, 185, 129, 0.5);
+    }
+
+    .checkmark {
+      display: none;
+      color: #fff;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .task.done .checkmark {
+      display: block;
+    }
+
+    /* Task text area */
+    .task-body {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .task-where {
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--cyan);
+      margin-bottom: 3px;
+    }
+
+    .task.done .task-where {
+      color: var(--done-text);
+    }
+
+    .task-what {
+      font-size: 0.88rem;
+      color: var(--text);
+      line-height: 1.5;
+    }
+
+    .task.done .task-what {
+      color: var(--done-text);
+      text-decoration: line-through;
+    }
+
+    /* Priority tag */
+    .priority {
+      font-size: 0.65rem;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 99px;
+      flex-shrink: 0;
+      margin-top: 3px;
+    }
+
+    .priority.urgent {
+      background: rgba(239, 68, 68, 0.2);
+      color: #f87171;
+      border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+
+    .priority.high {
+      background: rgba(245, 158, 11, 0.15);
+      color: #fbbf24;
+      border: 1px solid rgba(245, 158, 11, 0.25);
+    }
+
+    /* ── Summary stats ── */
+    .stats-row {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 28px;
+      flex-wrap: wrap;
+    }
+
+    .stat-card {
+      flex: 1;
+      min-width: 140px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px 20px;
+      text-align: center;
+    }
+
+    .stat-num {
+      font-size: 1.8rem;
+      font-weight: 800;
+      background: var(--grad-2);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .stat-label {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 600px) {
+      header { padding: 16px; }
+      h1 { font-size: 1.1rem; }
+      .progress-bar-outer { width: 100px; }
+      main { padding: 16px 12px 48px; }
+      .task { padding: 10px 14px; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="logo">
+      <div class="logo-icon">✦</div>
+      <div>
+        <h1>TAIS Website — Image Tasks</h1>
+        <div class="subtitle">Track every visual addition across all pages</div>
+      </div>
+    </div>
+    <div class="progress-wrap">
+      <span class="progress-label">Overall progress</span>
+      <div class="progress-bar-outer">
+        <div class="progress-bar-inner" id="progressBar" style="width:0%"></div>
+      </div>
+      <span class="progress-pct" id="progressPct">0%</span>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <div class="stats-row" id="statsRow">
+    <div class="stat-card">
+      <div class="stat-num" id="statTotal">0</div>
+      <div class="stat-label">Total Tasks</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num" id="statDone">0</div>
+      <div class="stat-label">Completed</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num" id="statLeft">0</div>
+      <div class="stat-label">Remaining</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num" id="statPages">0</div>
+      <div class="stat-label">Pages Fully Done</div>
+    </div>
+  </div>
+
+  <div id="app"></div>
+</main>
+
+<script>
+const PAGES = [
+  {
+    id: "homepage",
+    icon: "🏠",
+    color: "linear-gradient(135deg,#7b2ff7,#2563eb)",
+    name: "Homepage",
+    note: "Hero image exists. Needs visual upgrades throughout.",
+    tasks: [
+      { id:"hp1", where:"Service Cards", what:"A small 48–64px icon or thumbnail per card — AI-generated mini illustration: phone/robot for Voice Agents, gears/workflow for Automation, etc.", priority:"high" },
+      { id:"hp2", where:"\"By the Numbers\" Section", what:"A simple horizontal infographic rendering the three stats (5+ hours, 30 days, 0 skills) as large visual callouts with supporting iconography — currently bare numbers.", priority:"high" },
+      { id:"hp3", where:"\"The Process\" Steps 01–04", what:"A thin horizontal timeline graphic connecting the 4 steps, or small step illustrations — even numbered circle icons with a connecting line.", priority:"high" },
+      { id:"hp4", where:"Free Resources Cards", what:"Thumbnail preview images for each resource (AI Audit Checklist, Prompt Library, etc.) — mockups of a PDF cover or document preview.", priority:"" },
+      { id:"hp5", where:"Where / What Labels", what:"Add visible \"Where\" and \"What\" labels/headings to the service section to improve scannability.", priority:"" },
+    ]
+  },
+  {
+    id: "voice",
+    icon: "🎙️",
+    color: "linear-gradient(135deg,#9d5cff,#22d3ee)",
+    name: "AI Voice Agents",
+    note: "Currently has zero images.",
+    tasks: [
+      { id:"va1", where:"Page Banner", what:"AI-generated image of a friendly phone/headset or stylized waveform — something that communicates \"voice\" visually.", priority:"high" },
+      { id:"va2", where:"\"What Are AI Voice Agents?\" Section", what:"A simple diagram showing the call flow: Caller → AI Agent → Calendar/CRM/Human — a basic flowchart created in Canva or Figma.", priority:"high" },
+      { id:"va3", where:"Feature Cards (8 capabilities)", what:"A small icon per card — upgrading from emoji to consistent SVG icons or small AI-generated icons per feature.", priority:"" },
+      { id:"va4", where:"Use Cases Section", what:"One illustrative image per industry — medical office, restaurant, real estate. Small AI-generated thumbnails.", priority:"" },
+      { id:"va5", where:"Pricing Cards", what:"A simple comparison chart image showing the three tiers visually.", priority:"" },
+    ]
+  },
+  {
+    id: "automation",
+    icon: "⚙️",
+    color: "linear-gradient(135deg,#2563eb,#7b2ff7)",
+    name: "AI Workflow Automation",
+    note: "Currently has zero images.",
+    tasks: [
+      { id:"aw1", where:"Page Banner", what:"AI-generated image of interconnected gears, flow arrows, or a dashboard — conveying \"systems working together\".", priority:"high" },
+      { id:"aw2", where:"Workflow Types Section", what:"A mini diagram per workflow type (email → CRM → calendar) showing how the automation connects tools.", priority:"high" },
+      { id:"aw3", where:"ROI Calculator Callout Box", what:"A small calculator or chart icon.", priority:"" },
+      { id:"aw4", where:"How It Works Steps", what:"A visual flowchart of the 7-step process — a simple horizontal strip with numbered stages.", priority:"" },
+      { id:"aw5", where:"Integration Grid", what:"The actual logos of the listed tools (Gmail, Slack, Salesforce, etc.) — all freely available brand assets.", priority:"high" },
+    ]
+  },
+  {
+    id: "vibe",
+    icon: "💻",
+    color: "linear-gradient(135deg,#22d3ee,#7b2ff7)",
+    name: "Vibe Coding",
+    note: "Currently has zero images.",
+    tasks: [
+      { id:"vc1", where:"Page Banner", what:"Screenshot or mockup of code being written — or an AI-generated image of a person describing something in plain English while code appears on a screen.", priority:"high" },
+      { id:"vc2", where:"\"What We Can Build\" Cards", what:"A small thumbnail screenshot or mockup per category: booking system UI, dashboard, e-commerce storefront.", priority:"" },
+      { id:"vc3", where:"Comparison Box (Traditional vs. Vibe)", what:"A simple two-column visual with ❌ and ✅ icons — a graphic instead of an HTML table.", priority:"" },
+      { id:"vc4", where:"Example Projects Section", what:"Mini UI mockup screenshots for each example project (booking system, customer portal, etc.).", priority:"" },
+      { id:"vc5", where:"Tech Stack Section", what:"Tool logos: React, Next.js, Python, Vercel, etc. — all freely available.", priority:"" },
+    ]
+  },
+  {
+    id: "images",
+    icon: "🎨",
+    color: "linear-gradient(135deg,#f472b6,#7b2ff7)",
+    name: "AI Images & Video",
+    note: "⚠️ URGENT — page selling visual content has zero images. Highest priority.",
+    tasks: [
+      { id:"iv1", where:"Page Banner", what:"A grid/mosaic of sample AI-generated images in TAIS brand style — this page more than any other MUST show examples.", priority:"urgent" },
+      { id:"iv2", where:"\"What We Create\" Panels", what:"3–4 example outputs per category: product mockups, social media graphics, videos — actual samples of AI-generated work.", priority:"urgent" },
+      { id:"iv3", where:"Style Options Cards", what:"One example image per style: photorealistic, illustrated, 3D, minimalist — visual proof of what each style looks like.", priority:"urgent" },
+      { id:"iv4", where:"Use Cases Section", what:"Before/after pair — a plain product photo vs. AI-enhanced version, or stock image vs. custom AI image.", priority:"high" },
+    ]
+  },
+  {
+    id: "consulting",
+    icon: "🧭",
+    color: "linear-gradient(135deg,#2563eb,#22d3ee)",
+    name: "AI Consulting",
+    note: "Currently has zero images.",
+    tasks: [
+      { id:"ac1", where:"Page Banner", what:"A simple graphic of a roadmap or strategy board — conveying planning and direction.", priority:"high" },
+      { id:"ac2", where:"Service Cards", what:"A small icon or illustration per service: magnifying glass for assessment, map for roadmap, gears for implementation, etc.", priority:"" },
+      { id:"ac3", where:"Success Metrics Section", what:"An infographic showing the 6 metrics (time saved, cost reduction, etc.) as a visual dashboard rather than text cards.", priority:"high" },
+      { id:"ac4", where:"Case Studies", what:"For each of the 3 case studies, a simple header illustration representing the industry: medical cross, real estate house, shopping cart.", priority:"" },
+    ]
+  },
+  {
+    id: "about",
+    icon: "👤",
+    color: "linear-gradient(135deg,#7b2ff7,#f472b6)",
+    name: "About",
+    note: "Best-illustrated page — has SMcDowell.png, Mission.png, Vision.png.",
+    tasks: [
+      { id:"ab1", where:"Below Mission/Vision Cards", what:"A photo or AI-generated image of east Tennessee — a landscape, the skyline, or something that grounds the local identity.", priority:"" },
+      { id:"ab2", where:"Founder Section", what:"A small \"work in progress\" graphic or timeline showing the founding story: Spring 2025 → now.", priority:"" },
+    ]
+  },
+  {
+    id: "audit",
+    icon: "📋",
+    color: "linear-gradient(135deg,#10b981,#2563eb)",
+    name: "Free AI Audit",
+    note: "Currently has zero images.",
+    tasks: [
+      { id:"fa1", where:"Hero (Right Column, Above Form)", what:"An illustration of a checklist being completed, or a friendly AI robot holding a clipboard — warm, not intimidating.", priority:"high" },
+      { id:"fa2", where:"\"What You'll Walk Away With\" Cards", what:"A small icon or illustration per deliverable: lightning bolt for quick wins, toolbox for tool recs, calendar for 30-day plan, shield for guardrails.", priority:"" },
+      { id:"fa3", where:"Testimonial Section", what:"Headshot placeholders or simple avatar icons next to each quote — even a generic professional silhouette makes quotes feel more credible.", priority:"" },
+      { id:"fa4", where:"Process Steps 01–04", what:"A simple horizontal strip or timeline connecting the steps visually.", priority:"" },
+    ]
+  },
+  {
+    id: "contact",
+    icon: "📬",
+    color: "linear-gradient(135deg,#22d3ee,#2563eb)",
+    name: "Contact Page",
+    note: "Has Contact.png in sidebar. Layout works well — low urgency.",
+    tasks: [
+      { id:"ct1", where:"Location Detail", what:"A small map or \"East Tennessee\" geographic callout graphic near the location detail to add personality.", priority:"" },
+    ]
+  },
+  {
+    id: "casestudies",
+    icon: "📊",
+    color: "linear-gradient(135deg,#f59e0b,#7b2ff7)",
+    name: "Case Studies & Individual Pages",
+    note: "Listing has CS-1.png, CS-2.png, CS-3.png. Individual pages lack result infographics.",
+    tasks: [
+      { id:"cs1", where:"Case Study Card 1 (Listing Page)", what:"Ensure card 1 (lead scoring) has a distinct thumbnail image — currently no image.", priority:"high" },
+      { id:"cs2", where:"Inside Each Case Study", what:"A \"before vs. after\" infographic showing key metrics (18% → 26% conversion, 48hr → 6hr response time, etc.) as a visual comparison, not just a table.", priority:"high" },
+      { id:"cs3", where:"Lead Scoring Page", what:"A visual diagram of the hybrid scoring model (60% rules + 40% ML) as a pie chart or flow diagram.", priority:"" },
+    ]
+  },
+  {
+    id: "practical",
+    icon: "🛠️",
+    color: "linear-gradient(135deg,#7b2ff7,#10b981)",
+    name: "Practical Approach (Zero-Budget)",
+    note: "Priority order for sourcing all images at zero cost.",
+    tasks: [
+      { id:"pr1", where:"Integration / Tech Stack Sections", what:"Add tool logos (Gmail, Slack, React, Zapier, etc.) — free from official brand asset pages. High impact, zero cost.", priority:"high" },
+      { id:"pr2", where:"Service Cards, Feature Cards, Process Steps", what:"Expand inline SVG icons — add one icon per service card, feature card, and process step. Use Heroicons or Phosphor Icons (both free).", priority:"high" },
+      { id:"pr3", where:"Hero Images, Illustrations, Section Visuals", what:"Use your own AI image generation service to create all visuals. Becomes a talking point: \"these images were made with AI.\"", priority:"high" },
+      { id:"pr4", where:"Workflow Diagrams, Process Timelines, Before/After Comparisons", what:"Build flowcharts and infographics in Canva free tier.", priority:"" },
+      { id:"pr5", where:"AI Images & Video Page (URGENT)", what:"Add a gallery of 6–8 AI-generated example outputs at the top. No other page needs images more than the page selling AI images.", priority:"urgent" },
+    ]
+  },
+];
+
+// ── State ──────────────────────────────────────────────────────────────────
+
+const STORAGE_KEY = "tais-todo-v1";
+
+function loadState() {
+  try {
+    return JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
+  } catch { return {}; }
+}
+
+function saveState(state) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
+
+let state = loadState(); // { taskId: true/false }
+let collapsed = {}; // { pageId: bool }
+
+// ── Render ─────────────────────────────────────────────────────────────────
+
+function render() {
+  const app = document.getElementById("app");
+  app.innerHTML = "";
+
+  PAGES.forEach(page => {
+    const total = page.tasks.length;
+    const done = page.tasks.filter(t => state[t.id]).length;
+    const allDone = done === total;
+    const isCollapsed = collapsed[page.id];
+
+    const section = document.createElement("div");
+    section.className = "section" + (isCollapsed ? " collapsed" : "");
+
+    // Header
+    const header = document.createElement("div");
+    header.className = "section-header";
+    header.innerHTML = `
+      <div class="section-title-row">
+        <div class="section-icon" style="background:${page.color}">${page.icon}</div>
+        <div>
+          <div class="section-name">${page.name}</div>
+          ${page.note ? `<div style="font-size:0.7rem;color:var(--text-muted);margin-top:2px">${page.note}</div>` : ""}
+        </div>
+      </div>
+      <div class="section-meta">
+        <span class="badge${allDone ? " done" : ""}">${done}/${total}</span>
+        <span class="chevron">▼</span>
+      </div>
+    `;
+    header.addEventListener("click", () => {
+      collapsed[page.id] = !collapsed[page.id];
+      render();
+    });
+
+    // Task list
+    const list = document.createElement("div");
+    list.className = "task-list";
+
+    page.tasks.forEach(task => {
+      const isDone = !!state[task.id];
+      const item = document.createElement("div");
+      item.className = "task" + (isDone ? " done" : "");
+      item.innerHTML = `
+        <div class="checkbox"><span class="checkmark">✓</span></div>
+        <div class="task-body">
+          <div class="task-where">${task.where}</div>
+          <div class="task-what">${task.what}</div>
+        </div>
+        ${task.priority ? `<span class="priority ${task.priority}">${task.priority.toUpperCase()}</span>` : ""}
+      `;
+      item.addEventListener("click", () => {
+        state[task.id] = !state[task.id];
+        saveState(state);
+        render();
+      });
+      list.appendChild(item);
+    });
+
+    section.appendChild(header);
+    section.appendChild(list);
+    app.appendChild(section);
+  });
+
+  updateProgress();
+}
+
+function updateProgress() {
+  const allTasks = PAGES.flatMap(p => p.tasks);
+  const total = allTasks.length;
+  const done = allTasks.filter(t => state[t.id]).length;
+  const pct = total ? Math.round((done / total) * 100) : 0;
+  const pagesDone = PAGES.filter(p => p.tasks.every(t => state[t.id])).length;
+
+  document.getElementById("progressBar").style.width = pct + "%";
+  document.getElementById("progressPct").textContent = pct + "%";
+  document.getElementById("statTotal").textContent = total;
+  document.getElementById("statDone").textContent = done;
+  document.getElementById("statLeft").textContent = total - done;
+  document.getElementById("statPages").textContent = pagesDone;
+}
+
+render();
+</script>
+</body>
+</html>
